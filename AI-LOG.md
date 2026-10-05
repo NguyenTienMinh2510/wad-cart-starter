@@ -69,3 +69,25 @@ Tài liệu này ghi chép minh bạch quá trình sử dụng trợ lý AI (Ant
 - **Document & Evidence:**
   - Cập nhật kết quả xác minh CI thực tế vào `SELF_ASSESSMENT_REPORT.md` để hoàn tất tiêu chí The harness với đầy đủ minh chứng.
 
+
+---
+
+## Session 5: CI Verification & Rubric Assessment — 2026-10-06
+- **Tool:** Codex / ChatGPT; Node.js built-in tools và GitHub REST API.
+- **Prompt / Request từ sinh viên:** "CI trên GitHub đã chạy PASS thành công rồi. Hãy cập nhật các file tài liệu và tự chấm điểm đối chiếu theo đúng rule đã đặt ra giúp tôi".
+- **Trạng thái đầu phiên:** HEAD ở b34c8b44013666c80e7498850f9f88272bba47bb; working tree sạch. Trước phiên này, agent đã khôi phục main về mốc này theo yêu cầu "xóa commit phiên 5 và khôi phục về b34c8b44013666c80e7498850f9f88272bba47bb". Phiên 5 dưới đây ghi nhận công việc hiện tại, không tái tạo nội dung phiên đã gỡ.
+- **Plan / Audit:** Đọc quy tắc AGENTS, hợp đồng BRIEF, chu trình ECC, rubric và các tài liệu/mã hiện có. Giữ nguyên nội dung lịch sử, chỉ bổ sung kết quả xác minh mới.
+- **Check:** Agent chạy npm run check tại dự án: lint PASS, 9/9 tests PASS, 0 FAIL. Audit bằng Node.js stdlib xác nhận ES Modules, không có dependencies/devDependencies, đúng 9 test và mỗi test một assertion; rà soát từng test chỉ kiểm tra một hành vi.
+- **CI thực tế:** REST API xác nhận workflow CI, run [37360351155](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37360351155), completed / success; head_sha = b34c8b44013666c80e7498850f9f88272bba47bb. Job [verify](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37360351155/job/111933104911) completed / success, runner ubuntu-latest; workflow cấu hình Node.js 20 và npm run check.
+- **What it produced:** Bổ sung phiên này vào AI-LOG, bằng chứng CI vào BRIEF/ECC_PLAN_LOOP và bảng đánh giá mới vào SELF_ASSESSMENT_REPORT. Điểm đề xuất: 30 + 20 + 20 + 15 + 15 = 100/100; harness tăng từ 16 lên 20 nhờ bằng chứng CI.
+- **Thay đổi / từ chối / phần viết tay:** Sinh viên cung cấp thông tin CI PASS và yêu cầu cập nhật; agent kiểm chứng, chạy lệnh và viết phần bổ sung. Không ghi nhận sinh viên tự chạy terminal hoặc tự viết phần tài liệu mới. Không sửa Session 1–4, code, tests, workflow hoặc thêm dependencies; chưa commit/push phần bổ sung này.
+- **Giới hạn bằng chứng:** Kết quả CI trên thuộc commit b34c8b44013666c80e7498850f9f88272bba47bb, không phải một commit tài liệu mới. Các ghi nhận cũ được giữ như lịch sử; thông tin kế thừa trong Session 1 chưa được xác minh độc lập. Điểm là tự đánh giá đề xuất, chưa phải điểm chấm chính thức.
+
+---
+
+## Session 6: Commit Documentation & Monitor CI — 2026-10-06
+- **Tool:** Codex / ChatGPT; Git và GitHub REST API.
+- **Prompt / Request từ sinh viên:** "Tôi vừa chạy npm run check và tất cả test đều đã PASS 100%. Hãy giúp tôi stage toàn bộ các file tài liệu đã sửa, tạo commit với message docs(cart): finalize ECC evidence and rubric assessment, sau đó push lên GitHub và theo dõi trạng thái CI giúp tôi."
+- **Sinh viên / agent:** Sinh viên báo đã tự chạy gate thành công và cho phép commit/push. Đây là thông tin sinh viên cung cấp; bằng chứng agent chạy gate và kiểm chứng CI trước đó nằm tại Session 5.
+- **Checkpoint trước commit:** Agent xác nhận main có đúng bốn tài liệu thay đổi, git diff --check PASS; bổ sung phiên này, giữ nguyên Session 1–5. Commit dùng đúng message được yêu cầu, sau đó push origin main và xác minh CI theo SHA mới; kết quả cuối đối chiếu lịch sử Git, GitHub Actions và báo cáo trả lại sinh viên.
+- **What it produced / phần viết tay:** Agent viết phần nhật ký này; không sửa mã nguồn, tests hoặc dependencies. Các đoạn "chưa commit/push" trong Session 5 và tài liệu đánh giá mô tả checkpoint trước yêu cầu hiện tại.

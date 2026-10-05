@@ -88,3 +88,13 @@ Tài liệu này định nghĩa chu trình lặp (Looping Cycle): **Plan -> Exec
 - **Verify:** `npm run check` tại dự án PASS: lint PASS, 9/9 test PASS, 0 FAIL; `git diff --check` PASS. Môi trường local: Node.js v24.16.0, npm 11.13.0.
 - **Document:** Đã cập nhật nhật ký, brief và bảng tự đánh giá với dẫn chứng file/dòng/test.
 - **CI GitHub:** Workflow hiện có chạy cùng gate trên Node.js 20 / Ubuntu, khi push hoặc pull request vào `main`/`master`. Chưa có kết quả GitHub Actions cho thay đổi hiện tại; cần kiểm chứng sau khi push.
+
+## 4. Check & Document sau CI — Session 5, 2026-10-06
+
+Mục 3 mô tả kết quả ở thời điểm trước khi xác minh GitHub Actions. Kết quả bổ sung hiện tại:
+
+- **Plan / Audit:** Đối chiếu hợp đồng, AGENTS và rubric; bảo toàn các phần tài liệu đã có.
+- **Check local:** Agent chạy npm run check: lint PASS, 9/9 tests PASS, 0 FAIL. Audit ES Modules, zero dependencies và một assertion cho mỗi test PASS; rà soát từng hành vi test với đặc tả.
+- **Check CI:** API xác nhận commit b34c8b44013666c80e7498850f9f88272bba47bb, workflow [CI](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37360351155), job [verify](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37360351155/job/111933104911) đều completed / success. Runner ubuntu-latest; workflow dùng Node.js 20.
+- **Correct:** Không phát hiện lỗi implementation/test cần sửa trong lần kiểm tra này.
+- **Document:** Chỉ bổ sung AI-LOG, BRIEF, SELF_ASSESSMENT_REPORT và tài liệu này. Đánh giá mới nhất đề xuất 100/100; nội dung cũ giữ nguyên như lịch sử. Chưa commit/push các phần bổ sung.

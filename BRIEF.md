@@ -42,3 +42,12 @@ Theo yêu cầu bổ sung ngày 2026-10-06, phạm vi cho phép thêm `package.j
 
 ## 5. Execution Protocol
 Follow the loop defined in [`ECC_PLAN_LOOP.md`](file:///c:/Users/Minh/Desktop/24KTPM/wad-cart-starter/ECC_PLAN_LOOP.md) to implement, verify via `npm run check`, correct if needed, and log evidence.
+
+## 6. Evidence Update — Session 5, 2026-10-06
+
+Theo yêu cầu cập nhật tài liệu và tự chấm điểm sau CI PASS (prompt ghi tại AI-LOG Session 5), agent chỉ bổ sung bằng chứng dưới đây. Mục 1–5 và hợp đồng cartTotal được giữ nguyên.
+
+- Commit đã xác minh: b34c8b44013666c80e7498850f9f88272bba47bb.
+- Workflow [CI / run 37360351155](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37360351155) và job [verify](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37360351155/job/111933104911): completed / success, ubuntu-latest, Node.js 20 theo cấu hình workflow.
+- Gate local npm run check: lint PASS, 9/9 test PASS; không thêm dependencies.
+- Bảng tự đánh giá mới nhất ở SELF_ASSESSMENT_REPORT mục 3: đề xuất 100/100. Mức 96/100 trước đó là đánh giá trước khi xác minh CI.

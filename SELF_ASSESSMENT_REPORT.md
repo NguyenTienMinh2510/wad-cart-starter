@@ -1,3 +1,5 @@
+> **Trạng thái mới nhất — Session 7 (2026-10-06): điểm tự đánh giá đề xuất 100/100; xem mục 4.** CI thực tế SUCCESS cho commit 506ab2f97cde4679f0f34f47e7dfb12f9c1ab110. Mức 96/100 và các câu chưa xác minh CI/chưa commit ở phần cũ là lịch sử. Bộ 9 tests chưa có case qty âm riêng.
+
 # SELF-ASSESSMENT REPORT
 
 **Assignment:** CSC13008 - IA#1: `cartTotal` with a harness  
@@ -67,3 +69,35 @@
 - Chưa có test riêng cho qty âm để giữ đúng 9 test theo brief; implementation kiểm tra toàn bộ qty <= 0.
 - Chưa có bằng chứng sinh viên tự chạy terminal, tự viết phần bổ sung hoặc tự giải thích từng dòng trong lớp. Thông tin Session 1 kế thừa chưa được xác minh độc lập; các phần lịch sử được bảo toàn.
 - Chưa tạo ZIP và chưa có StudentID để đặt tên. Sinh viên cần xác nhận điểm trước khi nộp. Honesty Adjustment chỉ tính được khi có điểm chấm thực tế, không thể suy ra từ CI PASS.
+
+## 4. Current Self-Assessment & Harness Review — Session 7, 2026-10-06
+
+### 4.1. Điểm đề xuất và bằng chứng CI thực tế
+
+Điểm đề xuất hiện tại giữ ở **100/100**; bảng dưới đây là bảng hiện hành, thay thế mức 96/100 lịch sử ở mục 1. Gói nộp dự kiến: <StudentID>_100.zip. Đây là tự đánh giá theo rubric, không phải điểm chấm chính thức và không suy ra chỉ từ CI PASS.
+
+| Tiêu chí | Tối đa | Đề xuất | Bằng chứng và giới hạn |
+|---|---:|---:|---|
+| Behaviour | 30 | 30 | src/cart.js:2,6–16 đáp ứng công thức, giỏ rỗng, ship theo subtotal, Math.round và RangeError; điều kiện qty <= 0 bao gồm qty âm qua rà soát code. Tests chưa kiểm chứng qty âm riêng. |
+| Tests | 20 | 20 | test/cart.test.js:5–55 gồm 9 test độc lập với ví dụ, giỏ rỗng, dưới/bằng/trên ngưỡng ship, làm tròn, giá âm, qty bằng 0 và thập phân; đủ nhóm hành vi yêu cầu trong rubric. Điểm tối đa đề xuất không có nghĩa bao phủ mọi đầu vào. |
+| The harness | 20 | 20 | AGENTS mục 1–3 có stack, commands và NEVER; package.json có syntax gate cả hai file + node --test; workflow CI trên push. [Run 37362848540](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37362848540), job verify SUCCESS cho đúng commit 506ab2f97cde4679f0f34f47e7dfb12f9c1ab110. Gate chưa tự kiểm tra mọi NEVER. |
+| The brief | 15 | 15 | BRIEF mục 1–5 nêu phạm vi, hợp đồng, lỗi, zero dependencies và ma trận test; thiếu sót về phạm vi Harness được phân tích tại AI-LOG Session 7, chưa đổi brief trong phiên này. |
+| AI-LOG.md | 15 | 15 | Session 5–6 phân biệt agent/sinh viên và checkpoint; Session 7 lưu đủ 8 phát hiện, giải pháp, bài học, đính chính nhãn prompt Session 2/4 và kết quả CI của Session 6. Nội dung cũ được bảo toàn; thông tin kế thừa Session 1 chưa xác minh độc lập. |
+| **TOTAL** | **100** | **100** | Harness tăng từ 16 lên 20 so với đánh giá trước CI; hạn chế kiểm thử và nhật ký được công khai, người chấm quyết định mức thực tế. |
+
+- **CI đã hoàn tất:** workflow CI, event push, [run 37362848540](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37362848540) completed / success; [job verify](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37362848540/job/111941320404) completed / success trên ubuntu-latest. Workflow dùng Node.js 20; bước Run verification gate (lint + test) SUCCESS.
+- **Phạm vi bằng chứng:** head_sha = 506ab2f97cde4679f0f34f47e7dfb12f9c1ab110. CI trên đã được agent xác minh ở lượt commit/push trước; không phải CI của các tài liệu bổ sung chưa commit trong Session 7.
+
+### 4.2. What I Did Not Manage (Những điều chưa làm được)
+
+- **Chưa có unit test riêng cho qty âm.** Trong 9 tests, lỗi số lượng hiện được kiểm tra bằng qty = 0 và qty = 1.5. Implementation dùng !Number.isInteger(qty) || qty <= 0, nên qty âm bị từ chối theo rà soát code, nhưng suite chưa có bằng chứng thực thi độc lập cho trường hợp đó. Nếu guard bị đổi sai thành chỉ loại qty === 0 và qty thập phân, cả 9 tests vẫn có thể PASS. Chưa mở rộng suite trong phiên này để giữ đúng phạm vi 9 tests; không tuyên bố bao phủ toàn bộ đầu vào.
+- Gate hiện chỉ kiểm tra cú pháp và chạy tests. Zero dependencies, đúng 9 tests và tính độc lập từng hành vi chưa được tự động bảo vệ đầy đủ trong npm run check. Script audit stdlib và các thay đổi phạm vi/hướng dẫn môi trường mới ở mức đề xuất trong AI-LOG Session 7.
+- Nhật ký cũ có nhãn prompt Session 2/4 chưa chính xác như đã đính chính tại Session 7; thông tin tool/phần viết tay Session 1 chưa được xác minh độc lập. CI xanh không kiểm chứng độ chính xác của tài liệu.
+- Sinh viên đã báo tự chạy npm run check ở yêu cầu Session 6; đây là thông tin sinh viên cung cấp. Chưa có bằng chứng độc lập về việc tự giải thích từng dòng trong lớp hoặc tự viết các đoạn tài liệu do agent bổ sung.
+- Chưa tạo ZIP, chưa có StudentID và chưa có xác nhận điểm nộp cuối cùng. Honesty Adjustment cần điểm chấm thực tế; không thể tính từ kết quả CI.
+- Các phần bổ sung Session 7 đang local; chưa commit/push và chưa có CI riêng cho chúng.
+
+### 4.3. Local Verification sau cập nhật
+
+- Agent chạy npm run check tại repository trong Session 7 (npm.cmd run check trên PowerShell): syntax gate src/cart.js và test/cart.test.js PASS; node --test chạy đúng 9 tests, 9 PASS, 0 FAIL, 0 skipped/cancelled/todo.
+- Code, bộ 9 tests, package.json và CI workflow giữ nguyên so với HEAD. Chỉ hai tài liệu được cập nhật; nội dung lịch sử được bảo toàn.

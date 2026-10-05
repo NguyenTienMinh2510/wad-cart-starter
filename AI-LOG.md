@@ -91,3 +91,123 @@ Tài liệu này ghi chép minh bạch quá trình sử dụng trợ lý AI (Ant
 - **Sinh viên / agent:** Sinh viên báo đã tự chạy gate thành công và cho phép commit/push. Đây là thông tin sinh viên cung cấp; bằng chứng agent chạy gate và kiểm chứng CI trước đó nằm tại Session 5.
 - **Checkpoint trước commit:** Agent xác nhận main có đúng bốn tài liệu thay đổi, git diff --check PASS; bổ sung phiên này, giữ nguyên Session 1–5. Commit dùng đúng message được yêu cầu, sau đó push origin main và xác minh CI theo SHA mới; kết quả cuối đối chiếu lịch sử Git, GitHub Actions và báo cáo trả lại sinh viên.
 - **What it produced / phần viết tay:** Agent viết phần nhật ký này; không sửa mã nguồn, tests hoặc dependencies. Các đoạn "chưa commit/push" trong Session 5 và tài liệu đánh giá mô tả checkpoint trước yêu cầu hiện tại.
+
+---
+
+## Session 7: Rà soát & khắc phục lỗ hổng Harness — 2026-10-06
+
+- **Tool:** Codex / ChatGPT; đọc tài liệu, mã và lịch sử Git, ghi tài liệu, chạy Node.js/npm.
+- **Yêu cầu rà soát trước đó — nguyên văn:**
+
+> *Nhìn lại toàn bộ quá trình chạy vòng lặp ECC từ đầu đến giờ, hãy phân tích xem bộ Rule và Harness ban đầu của dự án có những lỗ hổng, điểm nghẽn hoặc thiếu sót nào (về lệnh kiểm tra gate, phạm vi file, cách ra lệnh ghi file hay rào cản môi trường) từng khiến bạn bị lúng túng hoặc bỏ sót không? Sau đó đề xuất giải pháp khắc phục cụ thể và rút ra bài học kinh nghiệm giúp tôi.*
+
+- **Yêu cầu ghi nhận hiện tại — bản chép nội dung, chuẩn hóa định dạng Markdown/đường dẫn inline:**
+
+> *Bây giờ hãy giúp tôi thực hiện bước tiếp theo:*
+> *1. Ghi nhận toàn bộ nội dung phân tích vào AI-LOG.md (dưới dạng Session rà soát & khắc phục lỗ hổng Harness).* *2. Đồng bộ lại SELF_ASSESSMENT_REPORT.md: làm rõ điểm tự đánh giá (đã có CI thực tế), ghi nhận rõ hạn chế về test qty âm vào mục 'What I Did Not Manage' đúng như bạn vừa phân tích.* *3. Chạy npm run check để đảm bảo tài liệu không làm ảnh hưởng đến mã nguồn và toàn bộ 9/9 tests vẫn PASS.*
+
+- **Plan / Audit:** HEAD 506ab2f97cde4679f0f34f47e7dfb12f9c1ab110; working tree sạch trước cập nhật. Đối chiếu AGENTS, BRIEF, ECC_PLAN_LOOP, package.json, workflow, code, 9 tests, rubric, nhật ký và báo cáo. Phân tích dưới đây ghi đầy đủ các phát hiện, đề xuất và bài học đã trả lời trong lượt trước; diễn đạt ở ngôi agent/sinh viên để lưu trong nhật ký.
+- **CI đã xác minh ở Session 6:** commit 506ab2f97cde4679f0f34f47e7dfb12f9c1ab110 được push lên main với message docs(cart): finalize ECC evidence and rubric assessment; [CI run 37362848540](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37362848540) và [job verify](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37362848540/job/111941320404) completed / success, ubuntu-latest, workflow Node.js 20, gate lint + test success. Đây là bổ sung kết quả cho checkpoint của Session 6, không sửa nội dung phiên cũ.
+
+### Nội dung phân tích vòng lặp ECC
+
+Rule ban đầu đã mô tả khá rõ cách tính cartTotal, nhưng Harness chưa kiểm soát đầy đủ việc ghi file, kiểm chứng và bảo toàn lịch sử. Một số thiếu sót đã gây vấn đề thực tế; một số còn tồn tại dù CI đang xanh.
+
+**1. Gate từng kiểm tra thiếu file**
+
+Theo AI-LOG Session 3, lệnh lint cũ truyền hai đường dẫn cho một lần node --check, khiến việc kiểm tra cú pháp không bao phủ cả hai file như dự định. Lệnh hiện tại đã sửa:
+
+~~~json
+"lint": "node --check src/cart.js && node --check test/cart.test.js",
+"check": "npm run lint && npm test"
+~~~
+
+Thiếu sót sâu hơn là tên "lint" dễ khiến người đọc tưởng gate kiểm tra cả các quy tắc dự án. Thực tế, node --check chỉ kiểm tra cú pháp; nó không xác minh zero dependencies, số lượng test hoặc tính độc lập của test.
+
+**Khắc phục đề xuất:** mô tả chính xác từng gate kiểm tra gì. Nếu muốn tự động bảo vệ các điều kiện cấu trúc, thêm một script nhỏ dùng Node.js stdlib vào check; việc rà soát "mỗi test một hành vi" vẫn cần đọc test, không thể chỉ đếm assertion.
+
+**2. Phạm vi file chưa bao phủ công việc cần làm**
+
+Danh sách ban đầu trong BRIEF cho phép sửa implementation, tests và tài liệu, nhưng chưa có package.json. Khi gate sai, agent phải xử lý một file nằm ngoài danh sách ban đầu. Đồng thời, ECC yêu cầu cập nhật BRIEF nhưng chính BRIEF chưa nằm trong danh sách được sửa.
+
+**Khắc phục đề xuất:** nêu phạm vi theo nhiệm vụ:
+
+- Implementation: src/cart.js, test/cart.test.js.
+- Harness: scripts trong package.json, workflow CI khi nhiệm vụ có phần thiết lập/sửa gate.
+- Documentation: các tài liệu được chỉ định; BRIEF chỉ bổ sung thay đổi phạm vi hoặc hợp đồng khi có yêu cầu thực tế.
+
+Phạm vi rõ giúp agent sửa đúng nguyên nhân mà không tự mở rộng sang những file không liên quan.
+
+**3. Chưa phân biệt rõ "xuất mã" và "ghi mã vào dự án"**
+
+Ban đầu sinh viên yêu cầu "xuất nội dung hoàn chỉnh ... để tôi cập nhật". Với câu đó, trả mã trong hội thoại là đúng phạm vi. Sau đó sinh viên yêu cầu import, tức chuyển sang ghi file thật.
+
+Nhưng Session 2 lại ghi prompt import trong khi kết quả mô tả chỉ kiểm thử ở thư mục tạm, chưa cập nhật dự án. Đây là sự lệch giữa yêu cầu được ghi nhận và hành động thực tế.
+
+**Khắc phục đề xuất:** mỗi phiên phải xác định rõ đầu ra: mã đề xuất hay file đã ghi. Khi nhiệm vụ là import, điều kiện hoàn tất phải gồm file trong repository đã thay đổi, diff đúng phạm vi và gate chạy tại repository đó. PASS trên bản sao chỉ là bằng chứng kiểm tra bản sao.
+
+**4. Nhật ký thiếu quy tắc giữ nguyên prompt và lịch sử**
+
+Đây là vấn đề đáng chú ý nhất trong quá trình vừa rồi. Đã có việc diễn đạt lại prompt cũ dưới nhãn "Prompt từ sinh viên", khiến sinh viên phải yêu cầu kiểm tra và khôi phục lịch sử.
+
+Agent chịu trách nhiệm về việc trình bày phần diễn đạt lại như lời sinh viên. Rule chưa chặt không làm việc đó trở nên đúng.
+
+Ngoài ra, ECC Phase 5 dự kiến sẵn "sinh viên kiểm chứng". Nếu agent điền theo khuôn mà chưa có bằng chứng, log có thể ghi một hành động chưa xảy ra.
+
+**Khắc phục đề xuất:** bổ sung quy tắc cụ thể:
+
+> Giữ nguyên các phiên đã ghi. Prompt trích dẫn phải giữ nguyên nội dung lời người dùng; phần diễn giải phải mang nhãn "Tóm tắt của agent". Nếu phát hiện sai, bổ sung đính chính tham chiếu phiên cũ. Phân biệt hành động agent thực hiện, thông tin sinh viên cung cấp và việc chưa được xác minh.
+
+**5. ECC chưa có điều kiện hoàn tất cho bước Git và CI**
+
+Chu trình ban đầu tập trung vào code → gate local → tài liệu. "Chạy CI" dễ bị hiểu thành chạy cùng lệnh tại máy local.
+
+Trong thực tế cần phân biệt:
+
+| Bằng chứng | Chứng minh được |
+|---|---|
+| Gate local PASS | Bản đang kiểm tra chạy được trong môi trường local |
+| Có workflow YAML | CI đã được cấu hình |
+| Run CI SUCCESS với đúng SHA | GitHub đã kiểm tra commit cụ thể thành công |
+
+**Khắc phục đề xuất:** thêm checkpoint sau push: kiểm tra head_sha, workflow, job, trạng thái hoàn tất và kết luận. queued chưa phải PASS, cũng chưa phải FAIL. Lần commit tài liệu vừa rồi đã làm đúng bước này cho commit 506ab2f.
+
+**6. Rào cản môi trường chưa được ghi vào Harness**
+
+Các trở ngại thực tế gồm:
+
+- Máy Windows/PowerShell dùng npm.cmd trong các lần kiểm tra.
+- Local dùng Node.js 24, CI dùng Node.js 20.
+- Không có gh; phải theo dõi bằng REST API.
+- Sandbox hạn chế ghi .git và truy cập mạng, nên commit/push/API cần quyền thực thi phù hợp.
+- CRLF trên đĩa và LF trong Git từng khiến phép so sánh nguyên byte báo nhầm rằng tài liệu đã thay đổi.
+
+**Khắc phục đề xuất:** có bước kiểm tra môi trường ngắn trước Execute; ghi phiên bản Node/npm, công cụ có sẵn và quyền cần dùng. Khi so sánh nội dung văn bản, chuẩn hóa newline để đối chiếu; khi bảo toàn tài liệu cũ, giữ nguyên phần gốc. Quyền sandbox cần được phân biệt với việc sinh viên đã cho phép thực hiện nhiệm vụ.
+
+**7. Chín test PASS chưa chứng minh mọi quy tắc đều được bao phủ**
+
+Bộ test hiện tại tốt ở ngưỡng ship, kiểu number, làm tròn tổng cuối và các lỗi chính. Nhưng chưa có test riêng cho qty âm. Một implementation sai chỉ từ chối qty === 0 và qty thập phân vẫn có thể vượt qua các test lỗi hiện có.
+
+Ngoài ra, một assertion không tự động đồng nghĩa với một hành vi; đếm assertion chỉ là kiểm tra hỗ trợ.
+
+**Khắc phục đề xuất:** duy trì ma trận "rule → test → bằng chứng". Nếu giữ đúng chín unit tests, ghi rõ giới hạn và kiểm chứng bổ sung qty âm riêng, thay vì tuyên bố bao phủ toàn bộ đầu vào.
+
+**8. Bảo toàn lịch sử làm trạng thái hiện tại khó đọc**
+
+SELF_ASSESSMENT_REPORT vẫn mở đầu bằng 96/100, còn đánh giá mới nhất 100/100 nằm ở mục 3. Các câu "chưa commit/push" cũng đúng ở checkpoint cũ nhưng dễ bị đọc như trạng thái hiện tại.
+
+**Khắc phục đề xuất:** bổ sung một phần chỉ dẫn trạng thái mới nhất, tham chiếu phiên và commit tương ứng, đồng thời giữ nguyên các đoạn lịch sử. Đặc biệt, CI xanh cung cấp bằng chứng cho code/gate; tính chính xác của log và điểm tự đánh giá vẫn phải được rà soát riêng.
+
+**Bài học kinh nghiệm:** mỗi bước ECC cần một đầu ra cụ thể và một bằng chứng hoàn tất tương ứng. Với dự án này, ưu tiên cải thiện là sửa những khoảng trống về phạm vi, ghi file và nhật ký; giữ Harness nhỏ, nhưng bảo đảm nó thực sự kiểm tra những điều mà báo cáo tuyên bố.
+
+### Thực hiện khắc phục trong phiên này
+
+- **Execute / Document:** Bổ sung Session 7 vào AI-LOG; thêm chỉ dẫn trạng thái mới nhất và mục 4 vào SELF_ASSESSMENT_REPORT, làm rõ điểm đề xuất 100/100 sau CI thực tế và hạn chế chưa có unit test qty âm. Giữ nguyên tất cả nội dung lịch sử.
+- **Phạm vi thực hiện:** Chỉ cập nhật hai tài liệu theo yêu cầu. Các đề xuất thêm script audit, thay đổi AGENTS/BRIEF/ECC/workflow hoặc mở rộng test vẫn là đề xuất, chưa triển khai trong phiên này.
+- **Thay đổi / từ chối / phần viết tay:** Sinh viên yêu cầu ghi nhận và đồng bộ; agent phân tích, viết tài liệu và chạy gate. Không ghi nhận phần mới là sinh viên viết tay. Không sửa code/tests, không thêm dependencies; không commit/push trong yêu cầu hiện tại.
+- **Đính chính lịch sử:** Session 2 dùng prompt import cho phần công việc được mô tả là xuất mã và kiểm tra bản sao; nhãn prompt này không phản ánh chính xác yêu cầu xuất mã ban đầu. Session 4 trình bày lời yêu cầu Git Automation dưới dạng diễn đạt lại; không nên xem đó là bản trích nguyên văn. Các đoạn cũ được giữ nguyên, sai lệch được ghi nhận tại đây; thông tin công cụ/phần viết tay kế thừa ở Session 1 chưa được xác minh độc lập.
+
+### Verify sau cập nhật tài liệu
+
+- Agent chạy npm run check tại repository trong Session 7 (npm.cmd run check trên PowerShell): syntax gate src/cart.js và test/cart.test.js PASS; node --test chạy đúng 9 tests, 9 PASS, 0 FAIL, 0 skipped/cancelled/todo.
+- Chỉ AI-LOG.md và SELF_ASSESSMENT_REPORT.md thay đổi; src/cart.js, test/cart.test.js, package.json và workflow giữ nguyên so với HEAD. Không thêm dependencies.

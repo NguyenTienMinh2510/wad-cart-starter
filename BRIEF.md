@@ -51,3 +51,9 @@ Theo yêu cầu cập nhật tài liệu và tự chấm điểm sau CI PASS (pr
 - Workflow [CI / run 37360351155](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37360351155) và job [verify](https://github.com/NguyenTienMinh2510/wad-cart-starter/actions/runs/37360351155/job/111933104911): completed / success, ubuntu-latest, Node.js 20 theo cấu hình workflow.
 - Gate local npm run check: lint PASS, 9/9 test PASS; không thêm dependencies.
 - Bảng tự đánh giá mới nhất ở SELF_ASSESSMENT_REPORT mục 3: đề xuất 100/100. Mức 96/100 trước đó là đánh giá trước khi xác minh CI.
+
+## 7. Startup Harness Supplement — Session 8, 2026-10-06
+
+Sau trao đổi về việc ECC_PLAN_LOOP chưa được bảo đảm đọc trong phiên mới, agent bổ sung mục 4 vào AGENTS.md để yêu cầu đọc BRIEF và ECC_PLAN_LOOP trước khi lập kế hoạch/chỉnh sửa. Phạm vi bổ sung của công việc này gồm AGENTS.md và các tài liệu ghi nhận liên quan (BRIEF, AI-LOG, SELF_ASSESSMENT_REPORT); hợp đồng và bộ 9 tests giữ nguyên. Nội dung mục 1–6 được bảo toàn.
+
+Đây là hướng dẫn bắt buộc cho agent có hỗ trợ nạp AGENTS.md của repository; không phải script tự chạy hoặc lịch chạy nền. CI khi push vẫn do .github/workflows/ci.yml kích hoạt. Không thay đổi nội dung ECC_PLAN_LOOP hoặc tự thực hiện commit/push trong phiên này.

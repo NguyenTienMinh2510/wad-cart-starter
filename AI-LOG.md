@@ -211,3 +211,25 @@ SELF_ASSESSMENT_REPORT vẫn mở đầu bằng 96/100, còn đánh giá mới n
 
 - Agent chạy npm run check tại repository trong Session 7 (npm.cmd run check trên PowerShell): syntax gate src/cart.js và test/cart.test.js PASS; node --test chạy đúng 9 tests, 9 PASS, 0 FAIL, 0 skipped/cancelled/todo.
 - Chỉ AI-LOG.md và SELF_ASSESSMENT_REPORT.md thay đổi; src/cart.js, test/cart.test.js, package.json và workflow giữ nguyên so với HEAD. Không thêm dependencies.
+
+---
+
+## Session 8: Required Startup Reading for ECC — 2026-10-06
+
+- **Tool:** Codex / ChatGPT; đọc và cập nhật tài liệu repository, chạy npm gate.
+- **Prompt hiện tại — nguyên văn:** "vậy chưa đủ để tự động hóa rồi".
+- **Ngữ cảnh:** Sinh viên vừa hỏi ECC_PLAN_LOOP có được đưa vào context khi chạy lại từ đầu. Agent xác nhận AGENTS chưa bắt buộc đọc file này; BRIEF chỉ dẫn tới kế hoạch khi nó được đọc.
+- **Diễn giải của agent:** Xử lý khoảng trống ở bước khởi động bằng quy tắc đọc bắt buộc trong AGENTS. Đây là diễn giải từ trao đổi hiện tại, không phải một prompt yêu cầu chi tiết do sinh viên viết.
+- **Plan / Audit:** Working tree sạch, HEAD 1fd3f12a4b22f75888732ce6b6a05e909b18fce9. Đọc đầy đủ AGENTS, BRIEF, ECC_PLAN_LOOP và kiểm tra nhật ký cũ. CI push đã được cấu hình trong workflow; vấn đề đang xử lý là agent đọc kế hoạch trong phiên mới.
+- **Execute:** Bổ sung AGENTS mục 4: đọc BRIEF/ECC trước planning/editing, kiểm tra working tree/phạm vi, ghi file theo đúng loại yêu cầu, chạy gate và correct theo bằng chứng, log chỉ bổ sung, kiểm chứng CI theo SHA khi có nhiệm vụ push. Bổ sung phạm vi thay đổi vào BRIEF và ghi nhận giới hạn vào SELF_ASSESSMENT_REPORT.
+- **What changed / handwritten:** Agent viết các phần bổ sung; không ghi nhận đây là phần sinh viên viết tay. Giữ nguyên nội dung lịch sử, code, 9 tests, package.json và workflow. Không thêm dependencies.
+- **Giới hạn:** AGENTS là chỉ dẫn cho agent, không phải máy thực thi tự động. Việc nạp nó phụ thuộc môi trường/client của agent; chưa kiểm chứng bằng một phiên mới độc lập. Không tạo scheduler, pre-push hook hoặc script audit. Không commit/push trong yêu cầu hiện tại.
+
+- **Verify thực tế:** npm.cmd run check tại repository PASS: syntax gate cả hai file PASS, 9/9 tests PASS, 0 FAIL.
+
+### Bổ sung hội thoại & yêu cầu công bố fix
+
+- **Prompt khởi đầu trao đổi — nguyên văn:** "nếu chạy lại từ đầu thì ECC_PLAN_LOOP có được đưa vào context không".
+- **Tóm tắt phản hồi của agent:** File ECC không tự được đọc chỉ vì tồn tại trong repository; AGENTS chưa có yêu cầu startup reading. Agent đề xuất bổ sung chỉ dẫn, sau đó thực hiện khi sinh viên nhận xét còn thiếu tự động hóa. Đây là hướng dẫn cho agent có nạp AGENTS, không phải script cưỡng chế thực thi.
+- **Prompt công bố — nguyên văn:** "thực hiện commit và push đoạn hội thoại vừa rồi như 1 fix tự động hóa".
+- **Checkpoint công bố:** Sinh viên cho phép commit/push fix này. Agent rà soát bốn tài liệu đã sửa, bảo toàn nội dung cũ; message chọn là fix(harness): require ECC startup reading. Stage và commit sau gate, push origin main, đối chiếu CI theo SHA mới; kết quả cuối được báo kèm commit/run để kiểm tra độc lập. Các câu chưa commit/push ở phần trước là checkpoint lịch sử.

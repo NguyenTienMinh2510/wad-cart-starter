@@ -101,3 +101,11 @@
 
 - Agent chạy npm run check tại repository trong Session 7 (npm.cmd run check trên PowerShell): syntax gate src/cart.js và test/cart.test.js PASS; node --test chạy đúng 9 tests, 9 PASS, 0 FAIL, 0 skipped/cancelled/todo.
 - Code, bộ 9 tests, package.json và CI workflow giữ nguyên so với HEAD. Chỉ hai tài liệu được cập nhật; nội dung lịch sử được bảo toàn.
+
+## 5. Startup Harness Update — Session 8, 2026-10-06
+
+- AGENTS.md mục 4 bổ sung yêu cầu đọc BRIEF.md và ECC_PLAN_LOOP.md trước khi lập kế hoạch/chỉnh sửa, chạy gate sau thay đổi và ghi nhận bằng chứng theo đúng phiên. BRIEF mục 7 ghi rõ phạm vi bổ sung; các phần lịch sử giữ nguyên.
+- Điểm tự đánh giá đề xuất vẫn **100/100** theo bảng mục 4; thay đổi hướng dẫn khởi động không tạo thêm bằng chứng CI hoặc tự động tăng điểm. CI đã xác minh cho commit 1fd3f12 (run 37364898970, attempt 3 SUCCESS) ở lượt kiểm tra trước; các phần bổ sung Session 8 chưa commit/push.
+- **What I Did Not Manage — bổ sung:** Chưa xác minh việc tự đọc ECC trong một phiên agent mới độc lập. AGENTS là hướng dẫn, không phải cơ chế cưỡng chế bằng script; còn phụ thuộc client nạp AGENTS. Chưa triển khai script audit cấu trúc, hook hoặc scheduler. Hạn chế chưa có test riêng cho qty âm ở mục 4.2 vẫn còn; suite giữ đúng 9 tests.
+
+- **Gate local sau bổ sung:** npm.cmd run check PASS: lint PASS, 9/9 tests PASS, 0 FAIL.
